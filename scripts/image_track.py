@@ -14,12 +14,14 @@ from cv_bridge import CvBridge, CvBridgeError
 class image_track:
 
   def __init__(self):
-    self.image_pub = rospy.Publisher("left_tracker_image",Image, queue_size=5)
-    self.point_pub = rospy.Publisher("left_point", PointStamped, queue_size=5)
+    # self.image_pub = rospy.Publisher("left_tracker_image",Image, queue_size=5)
+    self.left_point_pub = rospy.Publisher("left_point", PointStamped, queue_size=5)
+    self.right_point_pub = rospy.Publisher("right_point", PointStamped, queue_size=5)
 
-    cv2.namedWindow("Image window", 1)
+    # cv2.namedWindow("Image window", 1)
     self.bridge = CvBridge()
-    self.image_sub = rospy.Subscriber("/left_cam/image_raw",Image,self.callback)
+    self.image_sub = rospy.Subscriber("/left_cam/image_raw",Image,self.left_callback)
+    self.image_sub = rospy.Subscriber("/right_cam/image_raw",Image,self.right_callback)
 
     # Trackbar stuff
     self.lower_threshold = np.array([66, 97, 180])
@@ -34,7 +36,7 @@ class image_track:
                                       [0, 0, 1.0]]).I
 
     cv2.namedWindow("Control", cv2.CV_WINDOW_AUTOSIZE); # Threshold Controller window
-    cv2.namedWindow("Thresholded Image", cv2.CV_WINDOW_AUTOSIZE); # Threshold image window
+    # cv2.namedWindow("Thresholded Image", cv2.CV_WINDOW_AUTOSIZE); # Threshold image window
 
     cv2.createTrackbar("LowH", "Control", self.lower_threshold[0], 255, self.updateLowH); # Hue (0 - 255)
     cv2.createTrackbar("HighH", "Control", self.upper_threshold[0], 255, self.updateHighH);
@@ -61,7 +63,7 @@ class image_track:
     self.invCameraMatrix = np.matrix([[self.f, 0, self.center_x],
                                           [0, self.f, self.center_y],
                                           [0, 0, 1.0]]).I
-  def callback(self,data):
+  def left_callback(self,data):
     try:
       cv_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
     except CvBridgeError, e:
@@ -80,7 +82,7 @@ class image_track:
     mask = cv2.dilate(mask, cv2.getStructuringElement(cv2.MORPH_DILATE, (3,3) ))
 
     # Mask image
-    cv_image = cv2.bitwise_and(cv_image, cv_image, mask=mask)
+    # cv_image = cv2.bitwise_and(cv_image, cv_image, mask=mask)
 
     # Use Mask to get blob information
     moments = cv2.moments(mask)
@@ -88,31 +90,59 @@ class image_track:
     if (area > 0):
       cx = int(moments['m10']/moments['m00']) # cx = M10/M00
       cy = int(moments['m01']/moments['m00']) # cy = M01/M00
-      cv2.circle(cv_image, (cx-5,cy-5), 10, (0,0,255))
-      self.postPoint(cx,cy) # Publish it
-      cv2.putText(cv_image,"Area: %10d, X: %3d, Y: %3d" % (area, cx, cy), (10,20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,255,0)) # bgr
+      # cv2.circle(cv_image, (cx-5,cy-5), 10, (0,0,255))
+      self.postLeftPoint(cx,cy) # Publish it
+      # cv2.putText(cv_image,"Area: %10d, X: %3d, Y: %3d" % (area, cx, cy), (10,20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,255,0)) # bgr
 
     # (rows,cols,channels) = cv_image.shape
 
-    cv2.imshow("Thresholded Image", cv_image)
+    # cv2.imshow("Thresholded Image", cv_image)
     k = cv2.waitKey(3) & 0xFF
     if k == 113 or k == 27: # Escape key = 27, 'q' = 113
       rospy.signal_shutdown("User Exit")
 
+    # try:
+    #   self.image_pub.publish(self.bridge.cv2_to_imgmsg(cv_image, "bgr8"))
+    # except CvBridgeError, e:
+    #   print e
+
+  def left_callback(self,data):
     try:
-      self.image_pub.publish(self.bridge.cv2_to_imgmsg(cv_image, "bgr8"))
+      cv_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
     except CvBridgeError, e:
       print e
 
-  def postPoint(self, x, y):
+    # Get HSV image
+    hsv = cv2.cvtColor(cv_image, cv2.COLOR_BGR2HSV)
 
+    # Threshold image to range
+    mask = cv2.inRange(hsv, self.lower_threshold, self.upper_threshold)
+
+    # Erode/Dilate mask to remove noise
+    mask = cv2.erode(mask, cv2.getStructuringElement(cv2.MORPH_ERODE, (3,3) ))
+    mask = cv2.dilate(mask, cv2.getStructuringElement(cv2.MORPH_DILATE, (3,3) ))
+
+    # Use Mask to get blob information
+    moments = cv2.moments(mask)
+    area = moments['m00']
+    if (area > 0):
+      cx = int(moments['m10']/moments['m00']) # cx = M10/M00
+      cy = int(moments['m01']/moments['m00']) # cy = M01/M00
+      self.postRightPoint(cx,cy) # Publish it
+
+  def postLeftPoint(self, x, y):
     worldPos = self.invCameraMatrix * np.matrix([[x],[y],[0.6096]])
-    # print worldPos
-
     point = PointStamped(header=Header(stamp=rospy.Time.now(),
                                        frame_id='/left_camera'),
                          point=Point(worldPos[0],worldPos[1],worldPos[2]))
-    self.point_pub.publish(point)
+    self.left_point_pub.publish(point)
+
+  def postRightPoint(self, x, y):
+    worldPos = self.invCameraMatrix * np.matrix([[x],[y],[0.6096]])
+    point = PointStamped(header=Header(stamp=rospy.Time.now(),
+                                       frame_id='/right_camera'),
+                         point=Point(worldPos[0],worldPos[1],worldPos[2]))
+    self.right_point_pub.publish(point)
 
 
 def main(args):
