@@ -10,6 +10,7 @@
 		name="marker_tf" args="0.0 3.0 1.0 0 0 0 /map /marker_frame 30"/>
 
 	<!-- Left Camera -->
+	<!-- These cameras have 15 fps it seems despite frame rate option-->
 	<node name="left_cam" pkg="usb_cam" type="usb_cam_node">
 		<param name="video_device" value="/dev/video0" />
 		<param name="camera_frame_id" value="left_camera" />
