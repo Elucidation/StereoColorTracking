@@ -1,9 +1,13 @@
 <launch>
-	<!-- camera transform -->
+	<!-- camera transforms -->
 	<node pkg="tf" type="static_transform_publisher" 
-		name="left_cam_tf" args="-0.2 0 1.0 0 0 0 /map /left_camera 30"/>
+		name="left_cam_tf" args="-0.2 0 1.0 3.14 3.14 1.57 /map /left_camera 30"/>
 	<node pkg="tf" type="static_transform_publisher" 
-		name="right_cam_tf" args="0.2 0 1.0 0 0 0 /map /right_camera 30"/>
+		name="right_cam_tf" args="0.2 0 1.0 3.14 3.14 1.57 /map /right_camera 30"/>
+
+	<!-- marker transforms -->
+	<node pkg="tf" type="static_transform_publisher" 
+		name="marker_tf" args="0.0 3.0 1.0 0 0 0 /map /marker_frame 30"/>
 
 	<!-- Left Camera -->
 	<node name="left_cam" pkg="usb_cam" type="usb_cam_node">
@@ -16,6 +20,9 @@
 		<param name="video_device" value="/dev/video1" />
 		<param name="camera_frame_id" value="right_camera" />
 	</node>
+
+	<!-- Markers -->
+	<node name="basic_shape_markers" pkg="stereo_color_tracker" type="basic_shapes" />
 
 	<!-- Launch visualizer -->
 	<node name="rviz_node" pkg="rviz" type="rviz" />

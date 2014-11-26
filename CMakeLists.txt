@@ -105,6 +105,7 @@ include_directories(
 
 ## Declare a cpp executable
 # add_executable(stereo_color_tracker_node src/stereo_color_tracker_node.cpp)
+add_executable(basic_shapes src/basic_shapes.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
@@ -114,6 +115,7 @@ include_directories(
 # target_link_libraries(stereo_color_tracker_node
 #   ${catkin_LIBRARIES}
 # )
+target_link_libraries(basic_shapes ${catkin_LIBRARIES})
 
 #############
 ## Install ##
