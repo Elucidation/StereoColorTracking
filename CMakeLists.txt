@@ -128,6 +128,8 @@ target_link_libraries(basic_shapes ${catkin_LIBRARIES})
 ## in contrast to setup.py, you can choose the destination
 install(PROGRAMS
   scripts/image_track.py
+  scripts/disparity_track.py
+  scripts/camera_threshold_helper.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
