@@ -14,12 +14,18 @@
 	<node name="left_cam" pkg="usb_cam" type="usb_cam_node">
 		<param name="video_device" value="/dev/video0" />
 		<param name="camera_frame_id" value="left_camera" />
+		<param name="framerate" value="30" />
+		<param name="image_width" value="1280" />
+		<param name="image_height" value="960" />
 	</node>
 
 	<!-- Right Camera -->
 	<node name="right_cam" pkg="usb_cam" type="usb_cam_node">
 		<param name="video_device" value="/dev/video1" />
 		<param name="camera_frame_id" value="right_camera" />
+		<param name="framerate" value="30" />
+		<param name="image_width" value="1280" />
+		<param name="image_height" value="960" />
 	</node>
 
 	<!-- Markers -->
