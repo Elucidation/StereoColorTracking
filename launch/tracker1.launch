@@ -1,0 +1,22 @@
+<launch>
+	<!-- camera transform -->
+	<node pkg="tf" type="static_transform_publisher" 
+		name="left_cam_tf" args="-0.2 0 1.0 0 0 0 /map /left_camera 30"/>
+	<node pkg="tf" type="static_transform_publisher" 
+		name="right_cam_tf" args="0.2 0 1.0 0 0 0 /map /right_camera 30"/>
+
+	<!-- Left Camera -->
+	<node name="left_cam" pkg="usb_cam" type="usb_cam_node">
+		<param name="video_device" value="/dev/video0" />
+		<param name="camera_frame_id" value="left_camera" />
+	</node>
+
+	<!-- Right Camera -->
+	<node name="right_cam" pkg="usb_cam" type="usb_cam_node">
+		<param name="video_device" value="/dev/video1" />
+		<param name="camera_frame_id" value="right_camera" />
+	</node>
+
+	<!-- Launch visualizer -->
+	<node name="rviz_node" pkg="rviz" type="rviz" />
+</launch>
