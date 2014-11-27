@@ -32,8 +32,12 @@ class disparity_track:
     # self.upper_threshold = np.array([63, 149, 233])
 
     # Green Marker 3d print table nov 26
-    self.lower_threshold = np.array([60, 96, 131])
-    self.upper_threshold = np.array([84, 221, 255])
+    # self.lower_threshold = np.array([60, 96, 131])
+    # self.upper_threshold = np.array([84, 221, 255])
+
+    # Green Android
+    self.lower_threshold = np.array([39, 68, 163])
+    self.upper_threshold = np.array([79, 222, 255])
 
     self.disparity_ratio = 211.4
     # 1280 x 960 image
@@ -117,8 +121,8 @@ class disparity_track:
     mask = cv2.inRange(hsv, self.lower_threshold, self.upper_threshold)
 
     # Erode/Dilate mask to remove noise
-    mask = cv2.erode(mask, cv2.getStructuringElement(cv2.MORPH_ERODE, (3,3) ))
-    mask = cv2.dilate(mask, cv2.getStructuringElement(cv2.MORPH_DILATE, (3,3) ))
+    # mask = cv2.erode(mask, cv2.getStructuringElement(cv2.MORPH_ERODE, (3,3) ))
+    # mask = cv2.dilate(mask, cv2.getStructuringElement(cv2.MORPH_DILATE, (3,3) ))
 
     # Use Mask to get blob information
     moments = cv2.moments(mask)
@@ -144,8 +148,8 @@ class disparity_track:
 
 
 def main(args):
-  ic = disparity_track()
   rospy.init_node('disparity_track', anonymous=True)
+  ic = disparity_track()
   try:
     rospy.spin()
   except KeyboardInterrupt:

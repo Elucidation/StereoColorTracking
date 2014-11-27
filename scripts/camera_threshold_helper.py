@@ -25,6 +25,10 @@ class camera_threshold_helper:
     self.lower_threshold = np.array([66, 97, 131])
     self.upper_threshold = np.array([96, 222, 255])
 
+    # # Green Android
+    # self.lower_threshold = np.array([39, 68, 163])
+    # self.upper_threshold = np.array([79, 222, 255])
+
     self.f = 2684.0
     # 1280 x 960 image
     self.center_x = (1280.0/2.0)/0.6096
@@ -76,8 +80,8 @@ class camera_threshold_helper:
     mask = cv2.inRange(hsv, self.lower_threshold, self.upper_threshold)
 
     # Erode/Dilate mask to remove noise
-    mask = cv2.erode(mask, cv2.getStructuringElement(cv2.MORPH_ERODE, (3,3) ))
-    mask = cv2.dilate(mask, cv2.getStructuringElement(cv2.MORPH_DILATE, (3,3) ))
+    # mask = cv2.erode(mask, cv2.getStructuringElement(cv2.MORPH_ERODE, (2,2) ))
+    # mask = cv2.dilate(mask, cv2.getStructuringElement(cv2.MORPH_DILATE, (2,2) ))
 
     # Mask image
     cv_image = cv2.bitwise_and(cv_image, cv_image, mask=mask)

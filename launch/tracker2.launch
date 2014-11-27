@@ -12,8 +12,8 @@
 	<node pkg="tf" type="static_transform_publisher" 
 		name="right_cam_tf" args="0.0 -0.25 1.0 -1.570796 0 -1.570796 /map /right_camera 30"/>
 	<!-- marker transforms -->
-	<node pkg="tf" type="static_transform_publisher" 
-		name="marker_tf" args="2.0 0.0 1.0 0 0 0 /map /marker_frame_left 30"/>
+	<!-- <node pkg="tf" type="static_transform_publisher" 
+		name="marker_tf" args="2.0 0.0 1.0 0 0 0 /map /marker_frame_left 30"/> -->
 <!-- 	<node pkg="tf" type="static_transform_publisher" 
 		name="marker_tf2" args="2.0 -0.25 1.0 0 0 0 /map /marker_frame_right 30"/>
  -->
